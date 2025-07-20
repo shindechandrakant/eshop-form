@@ -2,66 +2,122 @@ import React, { useState } from "react";
 import { Save, Download, Eye } from "lucide-react";
 import { GiftCard } from "../types/GiftCard";
 import { FormSection } from "./FormSection";
-import { ImageForm } from "./ImageForm";
-import { SimpleArrayForm } from "./SimpleArrayForm";
-import { RedemptionStepsForm } from "./RedemptionStepsForm";
-import { ConditionsForm } from "./ConditionsForm";
-import { InformationForm } from "./InformationForm";
-import { addCardService } from "../api";
+import { CountryForm } from "./CountryForm";
+import { CategoryFormGift } from "./CategoryFormGift";
+import { VoucherOptionsForm } from "./VoucherOptionsForm";
+import { OccasionsForm } from "./OccasionsForm";
+import { RedemptionStepsFormNew } from "./RedemptionStepsFormNew";
+import { StoreLocatorForm } from "./StoreLocatorForm";
+import { StringArrayFormWithUpload } from "./StringArrayFormWithUpload";
+import { ImageUploadField } from "./ImageUploadField";
+import { slugify } from "../utils/slugify";
+import { addCardService } from "../../public/api/api";
 
 export const GiftCardForm: React.FC = () => {
-  const object = {
-    name: "",
+  const [formData, setFormData] = useState<GiftCard>({
+    country: [],
+    category: [],
+    giftCardCompany: {
+      id: "",
+      name: "",
+    },
+    companyDescription: "",
+    redemptionOption: "both",
+    voucherDescription: "",
+    thumbnailImage: "",
     images: [],
-    categories: [],
-    occasions: [],
-    categoriesImages: [],
-    description: "",
-    whereToRedeem: [],
     howToRedeem: [],
-    termsAndConditions: {
-      title: "",
-      conditions: [],
-    },
-    instructions: {
-      title: "",
-      conditions: [],
-    },
-    moreInfo: {
-      title: "",
-      description: "",
-      information: [],
-    },
-    discount: 0,
-    oldPrice: {
-      type: "",
-      value: "",
-    },
-    B2B: 0,
-    B2C: 0,
-    Brand: [],
-    cardType: "",
-    status: "active",
-  };
-  const [formData, setFormData] = useState<GiftCard>({ ...object });
+    termsAndConditions: [],
+    usageInstructions: [],
+    storeLocator: [],
+    watchVideo: [],
+    voucherOptions: [],
+    occasions: [],
+    isFeatured: false,
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Required field validations based on Joi schema
+    if (formData.country.length === 0) {
+      newErrors.country = "At least one country is required";
+    }
+
+    if (formData.category.length === 0) {
+      newErrors.category = "At least one category is required";
+    }
+
+    if (!formData.giftCardCompany.name.trim()) {
+      newErrors.giftCardCompanyName = "Company name is required";
+    }
+
+    if (!formData.companyDescription.trim()) {
+      newErrors.companyDescription = "Company description is required";
+    }
+
+    if (!formData.thumbnailImage.trim()) {
+      newErrors.thumbnailImage = "Thumbnail image is required";
+    }
+
+    if (formData.images.length === 0) {
+      newErrors.images = "At least one image is required";
+    }
+
+    if (formData.termsAndConditions.length === 0) {
+      newErrors.termsAndConditions = "Terms and conditions are required";
+    }
+
+    if (formData.voucherOptions.length === 0) {
+      newErrors.voucherOptions = "At least one voucher option is required";
+    }
+
+    // Validate voucher options
+    formData.voucherOptions.forEach((option, index) => {
+      if (!option.denominationCurrency) {
+        newErrors[`voucherOption${index}Currency`] = "Currency is required";
+      }
+      if (!option.denomination) {
+        newErrors[`voucherOption${index}Denomination`] = "Denomination is required";
+      }
+      if (!option.customerPrice) {
+        newErrors[`voucherOption${index}CustomerPrice`] = "Customer price is required";
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    addCardService(formData);
-    setFormData({ ...object });
-    alert("Gift card data logged to console!");
+
+    if (validateForm()) {
+      console.log("Gift Card Data:", JSON.stringify(formData, null, 2));
+      const response = await addCardService(formData);
+      console.log("Response:", response);
+      alert("Gift card data logged to console!");
+    } else {
+      alert("Please fix the validation errors before submitting.");
+    }
   };
 
   const handleExport = () => {
-    const dataStr = JSON.stringify(formData, null, 2);
-    const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    if (validateForm()) {
+      const dataStr = JSON.stringify(formData, null, 2);
+      const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
 
-    const exportFileDefaultName = `gift-card-${formData.name || "untitled"}.json`;
+      const exportFileDefaultName = `gift-card-${formData.giftCardCompany.name || "untitled"}.json`;
 
-    const linkElement = document.createElement("a");
-    linkElement.setAttribute("href", dataUri);
-    linkElement.setAttribute("download", exportFileDefaultName);
-    linkElement.click();
+      const linkElement = document.createElement("a");
+      linkElement.setAttribute("href", dataUri);
+      linkElement.setAttribute("download", exportFileDefaultName);
+      linkElement.click();
+    } else {
+      alert("Please fix the validation errors before exporting.");
+    }
   };
 
   const handlePreview = () => {
@@ -99,135 +155,141 @@ export const GiftCardForm: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information */}
-          <FormSection title="Basic Information">
+          {/* Countries */}
+          <FormSection title="Supported Countries">
+            <CountryForm
+              countries={formData.country}
+              onChange={(country) => setFormData({ ...formData, country })}
+            />
+            {errors.country && <p className="text-red-500 text-sm mt-2">{errors.country}</p>}
+          </FormSection>
+
+          {/* Categories */}
+          <FormSection title="Categories">
+            <CategoryFormGift
+              categories={formData.category}
+              onChange={(category) => setFormData({ ...formData, category })}
+            />
+            {errors.category && <p className="text-red-500 text-sm mt-2">{errors.category}</p>}
+          </FormSection>
+
+          {/* Gift Card Company */}
+          <FormSection title="Gift Card Company">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Gift Card Name *
+                  Company Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.giftCardCompany.name}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      giftCardCompany: {
+                        ...formData.giftCardCompany,
+                        name: e.target.value,
+                        id: slugify(e.target.value),
+                      },
+                    })
+                  }
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="Amazon Gift Card"
+                  placeholder="Amazon"
                   required
                 />
+                {errors.giftCardCompanyName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.giftCardCompanyName}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Card Type</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                  Company ID (Auto-generated)
+                </label>
                 <input
                   type="text"
-                  value={formData.cardType}
-                  onChange={(e) => setFormData({ ...formData, cardType: e.target.value })}
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="e-gift, physical, digital"
+                  value={formData.giftCardCompany.id}
+                  className="block w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl shadow-sm text-slate-600 placeholder-slate-400"
+                  placeholder="Auto-generated from name"
+                  readOnly
                 />
               </div>
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Description
+                  Company Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  value={formData.companyDescription}
+                  onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
                   rows={4}
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400 resize-none"
-                  placeholder="Use this Amazon Gift Card to shop millions of items online."
+                  placeholder="Amazon is the world's largest online marketplace, offering a wide range of products."
+                  required
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Status</label>
-                <input
-                  type="text"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="active, inactive, pending"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Discount (%)
-                </label>
-                <input
-                  type="number"
-                  value={formData.discount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, discount: parseInt(e.target.value) || 0 })
-                  }
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  min="0"
-                  max="100"
-                  placeholder="20"
-                />
+                {errors.companyDescription && (
+                  <p className="text-red-500 text-sm mt-1">{errors.companyDescription}</p>
+                )}
               </div>
             </div>
           </FormSection>
 
-          {/* Pricing */}
-          <FormSection title="Pricing Information">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Basic Information */}
+          <FormSection title="Basic Information">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Old Price Type
+                  Redemption Option <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={formData.oldPrice.type}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      oldPrice: { ...formData.oldPrice, type: e.target.value },
-                    })
-                  }
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="currency"
-                />
+                <div className="space-y-3">
+                  {["in-store", "online", "both"].map((option) => (
+                    <label key={option} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="redemptionOption"
+                        value={option}
+                        checked={formData.redemptionOption === option}
+                        onChange={(e) =>
+                          setFormData({ ...formData, redemptionOption: e.target.value })
+                        }
+                        className="w-4 h-4 text-indigo-600 bg-white border-2 border-slate-300 focus:ring-indigo-500 focus:ring-2"
+                        required
+                      />
+                      <span className="text-sm font-medium text-slate-700 capitalize">
+                        {option === "in-store"
+                          ? "In-Store Only"
+                          : option === "online"
+                          ? "Online Only"
+                          : "Both In-Store & Online"}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">Featured</label>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.isFeatured}
+                    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                    className="w-5 h-5 text-indigo-600 bg-white border-2 border-slate-200 rounded focus:ring-indigo-500 focus:ring-2"
+                  />
+                  <span className="text-sm text-slate-700">Mark as featured gift card</span>
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Old Price Value
+                  Voucher Description
                 </label>
-                <input
-                  type="text"
-                  value={formData.oldPrice.value}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      oldPrice: { ...formData.oldPrice, value: e.target.value },
-                    })
-                  }
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="₹1000"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">B2B Price</label>
-                <input
-                  type="number"
-                  value={formData.B2B}
-                  onChange={(e) => setFormData({ ...formData, B2B: parseInt(e.target.value) || 0 })}
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">B2C Price</label>
-                <input
-                  type="number"
-                  value={formData.B2C}
-                  onChange={(e) => setFormData({ ...formData, B2C: parseInt(e.target.value) || 0 })}
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="1000"
+                <textarea
+                  value={formData.voucherDescription}
+                  onChange={(e) => setFormData({ ...formData, voucherDescription: e.target.value })}
+                  rows={4}
+                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400 resize-none"
+                  placeholder="Use this gift card on Amazon.in for shopping across categories."
                 />
               </div>
             </div>
@@ -235,185 +297,94 @@ export const GiftCardForm: React.FC = () => {
 
           {/* Images */}
           <FormSection title="Images">
-            <ImageForm
-              images={formData.images}
-              onChange={(images) => setFormData({ ...formData, images })}
-              title="Gift Card Images"
-            />
-          </FormSection>
-
-          {/* Categories Images */}
-          <FormSection title="Category Images">
-            <ImageForm
-              images={formData.categoriesImages}
-              onChange={(categoriesImages) => setFormData({ ...formData, categoriesImages })}
-              title="Category Icons"
-            />
-          </FormSection>
-
-          {/* Categories & Occasions */}
-          <FormSection title="Categories & Occasions">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <SimpleArrayForm
-                items={formData.categories}
-                onChange={(categories) => setFormData({ ...formData, categories })}
-                title="Categories"
-                singular="Category"
+            <div className="space-y-6">
+              <ImageUploadField
+                value={formData.thumbnailImage}
+                onChange={(thumbnailImage) => setFormData({ ...formData, thumbnailImage })}
+                label="Thumbnail Image"
+                required
+                placeholder="https://example.com/images/amazon-thumbnail.jpg"
               />
+              {errors.thumbnailImage && (
+                <p className="text-red-500 text-sm mt-1">{errors.thumbnailImage}</p>
+              )}
 
-              <SimpleArrayForm
-                items={formData.occasions}
-                onChange={(occasions) => setFormData({ ...formData, occasions })}
-                title="Occasions"
-                singular="Occasion"
+              <StringArrayFormWithUpload
+                items={formData.images}
+                onChange={(images) => setFormData({ ...formData, images })}
+                title="Gallery Images"
+                placeholder="https://example.com/images/amazon1.jpg"
+                required
+                allowUpload
+              />
+              {errors.images && <p className="text-red-500 text-sm mt-1">{errors.images}</p>}
+
+              <StringArrayFormWithUpload
+                items={formData.watchVideo}
+                onChange={(watchVideo) => setFormData({ ...formData, watchVideo })}
+                title="Watch Videos"
+                placeholder="https://example.com/videos/amazon-demo.mp4"
+                allowUpload
               />
             </div>
           </FormSection>
 
-          {/* Brands & Stores */}
-          <FormSection title="Brands & Redemption Stores">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <SimpleArrayForm
-                items={formData.Brand}
-                onChange={(Brand) => setFormData({ ...formData, Brand })}
-                title="Brands"
-                singular="Brand"
-              />
+          {/* Voucher Options */}
+          <FormSection title="Voucher Options">
+            <VoucherOptionsForm
+              voucherOptions={formData.voucherOptions}
+              onChange={(voucherOptions) => setFormData({ ...formData, voucherOptions })}
+            />
+            {errors.voucherOptions && (
+              <p className="text-red-500 text-sm mt-1">{errors.voucherOptions}</p>
+            )}
+          </FormSection>
 
-              <SimpleArrayForm
-                items={formData.whereToRedeem}
-                onChange={(whereToRedeem) => setFormData({ ...formData, whereToRedeem })}
-                title="Where to Redeem"
-                singular="Store"
-              />
-            </div>
+          {/* Occasions */}
+          <FormSection title="Occasions">
+            <OccasionsForm
+              occasions={formData.occasions}
+              onChange={(occasions) => setFormData({ ...formData, occasions })}
+            />
           </FormSection>
 
           {/* Redemption Steps */}
           <FormSection title="Redemption Instructions">
-            <RedemptionStepsForm
+            <RedemptionStepsFormNew
               steps={formData.howToRedeem}
               onChange={(howToRedeem) => setFormData({ ...formData, howToRedeem })}
             />
           </FormSection>
 
-          {/* Terms and Conditions */}
-          <FormSection title="Terms and Conditions">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Terms Title
-                </label>
-                <input
-                  type="text"
-                  value={formData.termsAndConditions.title}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      termsAndConditions: { ...formData.termsAndConditions, title: e.target.value },
-                    })
-                  }
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="Amazon Gift Card Terms"
-                />
-              </div>
+          {/* Terms and Instructions */}
+          <FormSection title="Terms and Instructions">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <StringArrayFormWithUpload
+                items={formData.termsAndConditions}
+                onChange={(termsAndConditions) => setFormData({ ...formData, termsAndConditions })}
+                title="Terms and Conditions"
+                placeholder="Gift card can be used only on Amazon.in."
+                required
+              />
 
-              <ConditionsForm
-                conditions={formData.termsAndConditions.conditions}
-                onChange={(conditions) =>
-                  setFormData({
-                    ...formData,
-                    termsAndConditions: { ...formData.termsAndConditions, conditions },
-                  })
-                }
-                title="Conditions"
+              <StringArrayFormWithUpload
+                items={formData.usageInstructions}
+                onChange={(usageInstructions) => setFormData({ ...formData, usageInstructions })}
+                title="Usage Instructions"
+                placeholder="Use the code at checkout."
               />
             </div>
+            {errors.termsAndConditions && (
+              <p className="text-red-500 text-sm mt-1">{errors.termsAndConditions}</p>
+            )}
           </FormSection>
 
-          {/* Instructions */}
-          <FormSection title="Usage Instructions">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Instructions Title
-                </label>
-                <input
-                  type="text"
-                  value={formData.instructions.title}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      instructions: { ...formData.instructions, title: e.target.value },
-                    })
-                  }
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="Usage Instructions"
-                />
-              </div>
-
-              <ConditionsForm
-                conditions={formData.instructions.conditions}
-                onChange={(conditions) =>
-                  setFormData({
-                    ...formData,
-                    instructions: { ...formData.instructions, conditions },
-                  })
-                }
-                title="Instructions"
-              />
-            </div>
-          </FormSection>
-
-          {/* More Info */}
-          <FormSection title="Additional Information">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  More Info Title
-                </label>
-                <input
-                  type="text"
-                  value={formData.moreInfo.title}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      moreInfo: { ...formData.moreInfo, title: e.target.value },
-                    })
-                  }
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="Additional Info"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Description
-                </label>
-                <textarea
-                  value={formData.moreInfo.description}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      moreInfo: { ...formData.moreInfo, description: e.target.value },
-                    })
-                  }
-                  rows={4}
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400 resize-none"
-                  placeholder="Valid for all Amazon categories except services."
-                />
-              </div>
-
-              <InformationForm
-                information={formData.moreInfo.information}
-                onChange={(information) =>
-                  setFormData({
-                    ...formData,
-                    moreInfo: { ...formData.moreInfo, information },
-                  })
-                }
-              />
-            </div>
+          {/* Store Locator */}
+          <FormSection title="Store Locator">
+            <StoreLocatorForm
+              stores={formData.storeLocator}
+              onChange={(storeLocator) => setFormData({ ...formData, storeLocator })}
+            />
           </FormSection>
 
           {/* Action Buttons */}

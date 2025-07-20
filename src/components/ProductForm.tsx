@@ -9,10 +9,9 @@ import { ThumbnailImageForm } from "./ThumbnailImageForm";
 import { ProductDetailsForm } from "./ProductDetailsForm";
 import { CompanyForm } from "./CompanyForm";
 import { SimpleStringArrayForm } from "./SimpleStringArrayForm";
-import { addProductService } from "../api";
 
 export const ProductForm: React.FC = () => {
-  const object = {
+  const [formData, setFormData] = useState<Product>({
     title: "",
     shortTitle: "",
     itemNumber: 0,
@@ -64,14 +63,11 @@ export const ProductForm: React.FC = () => {
       cashback: 0,
     },
     sizes: [],
-  };
-  const [formData, setFormData] = useState<Product>({ ...object });
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Product Data:", JSON.stringify(formData, null, 2));
-    addProductService(formData);
-    setFormData({ ...object });
     alert("Product data logged to console!");
   };
 

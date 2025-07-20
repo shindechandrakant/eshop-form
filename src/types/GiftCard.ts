@@ -1,9 +1,6 @@
-export interface Image {
-  categorytype: string;
+export interface Country {
   name: string;
-  url: string;
-  width: number;
-  height: number;
+  ISOCode: string;
 }
 
 export interface Category {
@@ -11,51 +8,30 @@ export interface Category {
   name: string;
 }
 
-export interface Occasion {
-  id: string;
-  name: string;
-}
-
-export interface Store {
+export interface GiftCardCompany {
   id: string;
   name: string;
 }
 
 export interface RedemptionStep {
-  position: number;
-  title: string;
-  description: string;
-  image: Image;
+  stepText: string;
+  imgUrl: string;
 }
 
-export interface Condition {
-  position: number;
-  description: string;
+export interface StoreLocation {
+  name: string;
+  address: string;
 }
 
-export interface Information {
-  position: number;
-  title: string;
-  description: string;
+export interface VoucherOption {
+  denominationCurrency: string;
+  denomination: number;
+  customerPrice: number;
+  discountPercentage?: number;
+  discountValue?: number;
 }
 
-export interface TermsAndConditions {
-  title: string;
-  conditions: Condition[];
-}
-
-export interface Instructions {
-  title: string;
-  conditions: Condition[];
-}
-
-export interface MoreInfo {
-  title: string;
-  description: string;
-  information: Information[];
-}
-
-export interface Brand {
+export interface Occasion {
   id: string;
   name: string;
 }
@@ -64,25 +40,20 @@ export interface GiftCard {
   _id?: {
     $oid: string;
   };
-  name: string;
-  images: Image[];
-  categories: Category[];
-  occasions: Occasion[];
-  categoriesImages: Image[];
-  description: string;
-  whereToRedeem: Store[];
+  country: Country[];
+  category: Category[];
+  giftCardCompany: GiftCardCompany;
+  companyDescription: string;
+  redemptionOption: string;
+  voucherDescription: string;
+  thumbnailImage: string;
+  images: string[];
   howToRedeem: RedemptionStep[];
-  termsAndConditions: TermsAndConditions;
-  instructions: Instructions;
-  moreInfo: MoreInfo;
-  discount: number;
-  oldPrice: {
-    type: string;
-    value: string;
-  };
-  B2B: number;
-  B2C: number;
-  Brand: Brand[];
-  cardType: string;
-  status: string;
+  termsAndConditions: string[];
+  usageInstructions: string[];
+  storeLocator: StoreLocation[];
+  watchVideo: string[];
+  voucherOptions: VoucherOption[];
+  occasions: Occasion[];
+  isFeatured: boolean;
 }
