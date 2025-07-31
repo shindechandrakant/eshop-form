@@ -1,28 +1,29 @@
-import React, { useRef } from 'react';
-import { Trash2, Plus, Upload, Loader2 } from 'lucide-react';
-import { RedemptionStep } from '../types/GiftCard';
+import React, { useRef } from "react";
+import { Trash2, Plus, Upload, Loader2 } from "lucide-react";
+import { RedemptionStep } from "../types/GiftCard";
 
 interface RedemptionStepsFormNewProps {
   steps: RedemptionStep[];
   onChange: (steps: RedemptionStep[]) => void;
 }
 
-export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ steps, onChange }) => {
+export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({
+  steps,
+  onChange,
+}) => {
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [uploadingIndex, setUploadingIndex] = React.useState<number | null>(null);
 
   const addStep = () => {
     const newStep: RedemptionStep = {
-      stepText: '',
-      imgUrl: '',
+      stepText: "",
+      imgUrl: "",
     };
     onChange([...steps, newStep]);
   };
 
   const updateStep = (index: number, field: keyof RedemptionStep, value: string) => {
-    const updatedSteps = steps.map((step, i) => 
-      i === index ? { ...step, [field]: value } : step
-    );
+    const updatedSteps = steps.map((step, i) => (i === index ? { ...step, [field]: value } : step));
     onChange(updatedSteps);
   };
 
@@ -37,28 +38,31 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ 
       setUploadingIndex(index);
       try {
         // Upload to Cloudflare
+
+        const url = "https://eshop-dev-api.rewardscompany.io/api/v1/giftcard/file/upload";
+        // Upload to Cloudflare
         const formData = new FormData();
-        formData.append('file', file);
-        
+        formData.append("files", file);
+
         // Mock Cloudflare upload - replace with actual endpoint
-        const response = await fetch('/api/upload-image', {
-          method: 'POST',
+        const response = await fetch(url, {
+          method: "POST",
           body: formData,
         });
-        
+
         if (response.ok) {
           const data = await response.json();
-          updateStep(index, 'imgUrl', data.url); // Cloudflare returns the image URL
+          updateStep(index, "imgUrl", data?.data?.[0]?.url); // Cloudflare returns the image URL
         } else {
           // Fallback to mock URL for demo
           const mockUrl = `https://imagedelivery.net/demo/${Date.now()}-${file.name}`;
-          updateStep(index, 'imgUrl', mockUrl);
+          updateStep(index, "imgUrl", mockUrl);
         }
       } catch (error) {
-        console.error('Upload failed:', error);
+        console.error("Upload failed:", error);
         // Fallback to mock URL for demo
         const mockUrl = `https://imagedelivery.net/demo/${Date.now()}-${file.name}`;
-        updateStep(index, 'imgUrl', mockUrl);
+        updateStep(index, "imgUrl", mockUrl);
       } finally {
         setUploadingIndex(null);
       }
@@ -84,7 +88,10 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ 
       </div>
 
       {steps.map((step, index) => (
-        <div key={index} className="border-2 border-slate-200 rounded-xl p-6 bg-gradient-to-br from-white to-slate-50 shadow-sm">
+        <div
+          key={index}
+          className="border-2 border-slate-200 rounded-xl p-6 bg-gradient-to-br from-white to-slate-50 shadow-sm"
+        >
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
               Step {index + 1}
@@ -97,7 +104,7 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ 
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -105,7 +112,7 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ 
               </label>
               <textarea
                 value={step.stepText}
-                onChange={(e) => updateStep(index, 'stepText', e.target.value)}
+                onChange={(e) => updateStep(index, "stepText", e.target.value)}
                 rows={3}
                 className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400 resize-none"
                 placeholder="Go to Amazon.in and log into your account."
@@ -121,12 +128,12 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ 
                 <input
                   type="url"
                   value={step.imgUrl}
-                  onChange={(e) => updateStep(index, 'imgUrl', e.target.value)}
+                  onChange={(e) => updateStep(index, "imgUrl", e.target.value)}
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
                   placeholder="https://example.com/images/redeem-step1.jpg"
                   required
                 />
-                
+
                 <button
                   type="button"
                   onClick={() => handleUploadClick(index)}
@@ -145,9 +152,9 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({ 
                     </>
                   )}
                 </button>
-                
+
                 <input
-                  ref={(el) => fileInputRefs.current[index] = el}
+                  ref={(el) => (fileInputRefs.current[index] = el)}
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileUpload(index, e)}
