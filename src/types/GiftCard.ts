@@ -28,6 +28,7 @@ export interface VoucherOption {
   denomination: number;
   customerPrice: number;
   discountPercentage?: number;
+  oldDenomination?: number;
   discountValue?: number;
 }
 
