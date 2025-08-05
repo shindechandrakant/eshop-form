@@ -51,9 +51,7 @@ export interface CashbackRate {
 export interface PricingDetails {
   maxCashbackPercentage: number;
   cashbackRates: CashbackRate[];
-  previousCashbackPercentage: {
-    $numberDecimal: string;
-  };
+  previousCashbackPercentage: number;
 }
 
 export interface Rating {

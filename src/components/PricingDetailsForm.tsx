@@ -74,16 +74,15 @@ export const PricingDetailsForm: React.FC<PricingDetailsFormProps> = ({
           </label>
           <input
             type="text"
-            value={pricingDetails.previousCashbackPercentage.$numberDecimal}
+            value={pricingDetails.previousCashbackPercentage}
             onChange={(e) =>
               onChange({
                 ...pricingDetails,
-                previousCashbackPercentage: { $numberDecimal: e.target.value },
+                previousCashbackPercentage: parseInt(e.target.value) || 0,
               })
             }
             className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
             placeholder="5"
-            required
           />
         </div>
       </div>

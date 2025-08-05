@@ -64,9 +64,7 @@ export const CashbackForm: React.FC<CashbackFormProps> = ({ editingCashback, onB
     pricingDetails: {
       maxCashbackPercentage: 0,
       cashbackRates: [],
-      previousCashbackPercentage: {
-        $numberDecimal: "0",
-      },
+      previousCashbackPercentage: 0,
     },
     brandRedirectURL: "",
     rating: {
