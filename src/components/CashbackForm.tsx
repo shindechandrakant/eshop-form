@@ -352,6 +352,20 @@ export const CashbackForm: React.FC<CashbackFormProps> = ({ editingCashback, onB
                   <p className="text-red-500 text-sm mt-1">{errors.brandDescription}</p>
                 )}
               </div>
+
+              <div className="md:col-span-2">
+                <ImageUploadField
+                  value={formData.brand.image || ""}
+                  onChange={(image) =>
+                    setFormData({
+                      ...formData,
+                      brand: { ...formData.brand, image },
+                    })
+                  }
+                  label="Brand Logo/Image"
+                  placeholder="https://example.com/images/apple-logo.jpg"
+                />
+              </div>
             </div>
           </FormSection>
 

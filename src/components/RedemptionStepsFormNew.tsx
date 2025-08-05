@@ -125,14 +125,32 @@ export const RedemptionStepsFormNew: React.FC<RedemptionStepsFormNewProps> = ({
                 Image URL <span className="text-red-500">*</span>
               </label>
               <div className="space-y-3">
-                <input
-                  type="url"
-                  value={step.imgUrl}
-                  onChange={(e) => updateStep(index, "imgUrl", e.target.value)}
-                  className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
-                  placeholder="https://example.com/images/redeem-step1.jpg"
-                  required
-                />
+                <div className="flex items-center space-x-3">
+                  <div className="flex-1">
+                    <input
+                      type="url"
+                      value={step.imgUrl}
+                      onChange={(e) => updateStep(index, "imgUrl", e.target.value)}
+                      className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
+                      placeholder="https://example.com/images/redeem-step1.jpg"
+                      required
+                    />
+                  </div>
+
+                  {/* Image Preview */}
+                  {step.imgUrl && step.imgUrl.startsWith("http") && (
+                    <div className="flex-shrink-0">
+                      <img
+                        src={step.imgUrl}
+                        alt={`Step ${index + 1} preview`}
+                        className="w-16 h-16 object-cover rounded-lg border-2 border-slate-200"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 <button
                   type="button"

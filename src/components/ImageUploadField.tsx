@@ -120,9 +120,28 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
         {/* Image Preview */}
         {value && (
           <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-xl">
-            <div className="flex items-center space-x-3">
-              <ImageIcon className="w-5 h-5 text-slate-500" />
-              <span className="text-sm text-slate-600 truncate flex-1">{value}</span>
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <img
+                  src={value}
+                  alt="Preview"
+                  className="w-16 h-16 object-cover rounded-lg border-2 border-slate-200"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    e.currentTarget.nextElementSibling!.style.display = "flex";
+                  }}
+                />
+                <div
+                  className="w-16 h-16 bg-slate-100 rounded-lg border-2 border-slate-200 flex items-center justify-center"
+                  style={{ display: "none" }}
+                >
+                  <ImageIcon className="w-6 h-6 text-slate-400" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-700 mb-1">Image Preview</p>
+                <p className="text-xs text-slate-500 truncate">{value}</p>
+              </div>
             </div>
           </div>
         )}

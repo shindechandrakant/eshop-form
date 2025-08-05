@@ -111,6 +111,20 @@ export const StringArrayFormWithUpload: React.FC<StringArrayFormWithUploadProps>
               />
             </div>
 
+            {/* Image Preview */}
+            {allowUpload && item && item.startsWith("http") && (
+              <div className="flex-shrink-0">
+                <img
+                  src={item}
+                  alt={`Preview ${index + 1}`}
+                  className="w-12 h-12 object-cover rounded-lg border-2 border-slate-200"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              </div>
+            )}
+
             <button
               type="button"
               onClick={() => removeItem(index)}
