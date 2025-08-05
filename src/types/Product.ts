@@ -67,9 +67,6 @@ export interface Pricing {
 }
 
 export interface Product {
-  _id?: {
-    $oid: string;
-  };
   title: string;
   shortTitle: string;
   itemNumber: number;

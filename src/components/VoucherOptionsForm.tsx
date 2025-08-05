@@ -165,7 +165,7 @@ export const VoucherOptionsForm: React.FC<VoucherOptionsFormProps> = ({
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Customer Price
               </label>
@@ -178,10 +178,12 @@ export const VoucherOptionsForm: React.FC<VoucherOptionsFormProps> = ({
                 className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
                 placeholder="475"
               />
-            </div>
+            </div> */}
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Discount %</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Max Discount %
+              </label>
               <input
                 type="number"
                 value={option.discountPercentage || ""}
@@ -195,7 +197,7 @@ export const VoucherOptionsForm: React.FC<VoucherOptionsFormProps> = ({
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Discount Value
               </label>
@@ -208,7 +210,7 @@ export const VoucherOptionsForm: React.FC<VoucherOptionsFormProps> = ({
                 className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
                 placeholder="25"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       ))}
