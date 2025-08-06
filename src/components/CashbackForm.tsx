@@ -13,6 +13,7 @@ import { StoreLocatorFormCashback } from "./StoreLocatorFormCashback";
 import { TimelineForm } from "./TimelineForm";
 import { StringArrayFormWithUpload } from "./StringArrayFormWithUpload";
 import { ImageUploadField } from "./ImageUploadField";
+import { addCashbackService } from "../../public/api/api";
 
 // Available categories for dropdown
 const AVAILABLE_CATEGORIES = [
@@ -132,17 +133,17 @@ export const CashbackForm: React.FC<CashbackFormProps> = ({ editingCashback, onB
       newErrors.brandRedirectURL = "Brand redirect URL is required";
     }
 
-    if (!formData.watchVideo.trim()) {
-      newErrors.watchVideo = "Watch video URL is required";
-    }
+    // if (!formData.watchVideo.trim()) {
+    //   newErrors.watchVideo = "Watch video URL is required";
+    // }
 
-    if (formData.coupons.length === 0) {
-      newErrors.coupons = "At least one coupon is required";
-    }
+    // if (formData.coupons.length === 0) {
+    //   newErrors.coupons = "At least one coupon is required";
+    // }
 
-    if (formData.deals.length === 0) {
-      newErrors.deals = "At least one deal is required";
-    }
+    // if (formData.deals.length === 0) {
+    //   newErrors.deals = "At least one deal is required";
+    // }
 
     if (formData.faqs.length === 0) {
       newErrors.faqs = "At least one FAQ is required";
@@ -152,9 +153,9 @@ export const CashbackForm: React.FC<CashbackFormProps> = ({ editingCashback, onB
       newErrors.termsAndConditions = "Terms and conditions are required";
     }
 
-    if (formData.storeLocator.length === 0) {
-      newErrors.storeLocator = "At least one store location is required";
-    }
+    // if (formData.storeLocator.length === 0) {
+    //   newErrors.storeLocator = "At least one store location is required";
+    // }
 
     if (formData.timeline.length === 0) {
       newErrors.timeline = "At least one timeline item is required";
@@ -164,11 +165,14 @@ export const CashbackForm: React.FC<CashbackFormProps> = ({ editingCashback, onB
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
       console.log("Cashback Data:", JSON.stringify(formData, null, 2));
+      const response = await addCashbackService(formData);
+      console.log("Response:", response);
+
       alert("Cashback data logged to console!");
     } else {
       alert("Please fix the validation errors before submitting.");
