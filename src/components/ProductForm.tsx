@@ -9,9 +9,10 @@ import { ThumbnailImageForm } from "./ThumbnailImageForm";
 import { ProductDetailsForm } from "./ProductDetailsForm";
 import { CompanyForm } from "./CompanyForm";
 import { SimpleStringArrayForm } from "./SimpleStringArrayForm";
+import { addProductService } from "../../public/api/api";
 
 export const ProductForm: React.FC = () => {
-  const [formData, setFormData] = useState<Product>({
+  const emptyData = {
     title: "",
     shortTitle: "",
     itemNumber: 0,
@@ -63,12 +64,22 @@ export const ProductForm: React.FC = () => {
       cashback: 0,
     },
     sizes: [],
-  });
+  };
+  const [formData, setFormData] = useState<Product>(JSON.parse(JSON.stringify(emptyData)));
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Product Data:", JSON.stringify(formData, null, 2));
-    alert("Product data logged to console!");
+  const handleSubmit = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault();
+      console.log("Product Data:", JSON.stringify(formData, null, 2));
+      const response = await addProductService(formData);
+      alert("Product data logged to console!");
+      setFormData(JSON.parse(JSON.stringify(emptyData)));
+      console.log(response);
+    } catch (error) {
+      handlePreview();
+      alert("Someting went wrong please download file, \n");
+      console.log(error);
+    }
   };
 
   const handleExport = () => {
