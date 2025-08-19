@@ -166,9 +166,7 @@ export const ProductForm: React.FC = () => {
                 <input
                   type="number"
                   value={formData.itemNumber}
-                  onChange={(e) =>
-                    setFormData({ ...formData, itemNumber: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={(e) => setFormData({ ...formData, itemNumber: e.target.value || 0 })}
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
                   placeholder="101"
                 />
@@ -384,7 +382,7 @@ export const ProductForm: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      pricing: { ...formData.pricing, b2b: parseInt(e.target.value) || 0 },
+                      pricing: { ...formData.pricing, b2b: e.target.value || 0 },
                     })
                   }
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
@@ -400,7 +398,7 @@ export const ProductForm: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      pricing: { ...formData.pricing, b2c: parseInt(e.target.value) || 0 },
+                      pricing: { ...formData.pricing, b2c: e.target.value || 0 },
                     })
                   }
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
@@ -416,7 +414,7 @@ export const ProductForm: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      pricing: { ...formData.pricing, taxes: parseInt(e.target.value) || 0 },
+                      pricing: { ...formData.pricing, taxes: e.target.value || 0 },
                     })
                   }
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"
@@ -436,7 +434,7 @@ export const ProductForm: React.FC = () => {
                       ...formData,
                       pricing: {
                         ...formData.pricing,
-                        deliveryCharges: parseInt(e.target.value) || 0,
+                        deliveryCharges: e.target.value || 0,
                       },
                     })
                   }
@@ -453,7 +451,7 @@ export const ProductForm: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      pricing: { ...formData.pricing, cashback: parseInt(e.target.value) || 0 },
+                      pricing: { ...formData.pricing, cashback: e.target.value || 0 },
                     })
                   }
                   className="block w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 text-slate-900 placeholder-slate-400"

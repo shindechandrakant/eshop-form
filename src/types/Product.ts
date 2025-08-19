@@ -59,17 +59,17 @@ export interface Manufacturer {
 }
 
 export interface Pricing {
-  b2b: string;
-  b2c: string;
-  taxes: string;
-  deliveryCharges: string;
-  cashback: string;
+  b2b: string | number;
+  b2c: string | number;
+  taxes: string | number;
+  deliveryCharges: string | number;
+  cashback: string | number;
 }
 
 export interface Product {
   title: string;
   shortTitle: string;
-  itemNumber: string;
+  itemNumber: string | number;
   description: string;
   category: Category[];
   brand: Brand;
