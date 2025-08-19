@@ -18,15 +18,15 @@ export interface Color {
 export interface Size {
   id: string;
   value: string;
-  count: number;
+  count: string;
 }
 
 export interface ThumbnailImage {
   id: string;
   string: string;
   caption: string;
-  height: number;
-  width: number;
+  height: string;
+  width: string;
 }
 
 export interface Delivery {
@@ -59,17 +59,17 @@ export interface Manufacturer {
 }
 
 export interface Pricing {
-  b2b: number;
-  b2c: number;
-  taxes: number;
-  deliveryCharges: number;
-  cashback: number;
+  b2b: string;
+  b2c: string;
+  taxes: string;
+  deliveryCharges: string;
+  cashback: string;
 }
 
 export interface Product {
   title: string;
   shortTitle: string;
-  itemNumber: number;
+  itemNumber: string;
   description: string;
   category: Category[];
   brand: Brand;
